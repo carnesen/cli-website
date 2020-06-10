@@ -1,0 +1,68 @@
+{
+	"name": "@carnesen/cli-website",
+	"description": "Source code for https://cli.carnesen.com/examples/index.html",
+	"version": "0.0.0-0",
+	"private": true,
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"engines": {
+		"node": ">=10.0.0"
+	},
+	"scripts": {
+		"build": "build.sh",
+		"start": "webpack-dev-server --config webpack.config.js",
+		"lint": "eslint src/",
+		"fix": "npm run lint -- --fix",
+		"test": "npm run lint && npm run build",
+		"prepublishOnly": "npm test"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"@carnesen/cli": "0.5.0-13",
+		"@carnesen/cli-examples": "0.5.0-13",
+		"@carnesen/tsconfig": "0.3.1",
+		"@types/jest": "25.2.3",
+		"@types/node": "14.0.12",
+		"clean-webpack-plugin": "3.0.0",
+		"css-loader": "3.5.3",
+		"eslint": "7.2.0",
+		"eslint-config-carnesen": "4.0.0",
+		"html-webpack-plugin": "4.3.0",
+		"style-loader": "1.2.1",
+		"ts-loader": "7.0.5",
+		"typescript": "3.9.5",
+		"webpack": "4.43.0",
+		"webpack-cli": "3.3.11",
+		"webpack-dev-server": "3.11.0",
+		"xterm": "4.6.0",
+		"xterm-addon-fit": "0.4.0"
+	},
+	"files": [
+		"src",
+		"lib",
+		"dist"
+	],
+	"publishConfig": {
+		"access": "public",
+		"tag": "next"
+	},
+	"keywords": [
+		"typescript",
+		"nodejs",
+		"cli",
+		"command-line-interface"
+	],
+	"author": {
+		"name": "Chris Arnesen",
+		"email": "chris.arnesen@gmail.com"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git://github.com/carnesen/cli.git"
+	},
+	"bugs": {
+		"url": "https://github.com/carnesen/cli/issues"
+	},
+	"homepage": "https://github.com/carnesen/cli#readme",
+	"license": "MIT"
+}
