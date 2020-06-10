@@ -9,7 +9,7 @@
 		"node": ">=10.0.0"
 	},
 	"scripts": {
-		"build": "build.sh",
+		"build": "./build.sh",
 		"start": "webpack-dev-server --config webpack.config.js",
 		"lint": "eslint src/",
 		"fix": "npm run lint -- --fix",
