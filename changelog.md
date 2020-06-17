@@ -1,6 +1,6 @@
 # @carnesen/cli-website change log
 
-## 2020-06
+## 2020.6.0
 Browser @carnesen/cli-examples REPL using xterm.js with
 - Command usage and invocation
 - Bash-like command history

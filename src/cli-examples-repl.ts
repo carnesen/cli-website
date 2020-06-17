@@ -1,6 +1,6 @@
 import { Terminal } from 'xterm';
 import { runCliAndExit, IRunCliAndExitOptions, Cli } from '@carnesen/cli';
-import { carnesenCliExamples } from '@carnesen/cli-examples';
+import { examples } from '@carnesen/cli-examples';
 import { CommandLineHistory } from './command-line-history';
 
 interface IPseudoShellOptions {
@@ -77,7 +77,7 @@ export class CliExamplesRepl {
 			case 9: {
 				// tab
 				if (this.line) {
-					const child = carnesenCliExamples.children.find((c) =>
+					const child = examples.children.find((c) =>
 						c.name.startsWith(this.line),
 					);
 					if (child) {
@@ -153,15 +153,15 @@ export class CliExamplesRepl {
 		};
 		this.runningCommand = true;
 		this.terminal.write('\r\n');
-		carnesenCliExamples.name = '';
-		carnesenCliExamples.description = `
+		examples.name = '';
+		examples.description = `
 		This is a special web terminal built on Xterm.js that runs the 
 		@carnesen/cli examples 
 		right there in your browser. Hit the Tab key for auto-complete. 
 		The up and down arrows navigate command history. Right and left arrow
 		aren't implemented yet.
 		`;
-		runCliAndExit(Cli(carnesenCliExamples), options)
+		runCliAndExit(Cli(examples), options)
 			.catch((err) => {
 				console.log(err); // eslint-disable-line no-console
 			})
