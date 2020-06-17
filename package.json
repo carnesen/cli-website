@@ -1,10 +1,7 @@
 {
 	"name": "@carnesen/cli-website",
-	"description": "Source code for https://cli.carnesen.com/examples/index.html",
-	"version": "0.0.0-0",
-	"private": true,
-	"main": "lib/index.js",
-	"types": "lib/index.d.ts",
+	"description": "Source for https://cli.carnesen.com/examples/index.html",
+	"version": "2020.6.0",
 	"engines": {
 		"node": ">=10.0.0"
 	},
@@ -14,12 +11,13 @@
 		"lint": "eslint src/",
 		"fix": "npm run lint -- --fix",
 		"test": "npm run lint && npm run build",
+		"unit-test": "jest src",
 		"prepublishOnly": "npm test"
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@carnesen/cli": "0.5.0-13",
-		"@carnesen/cli-examples": "0.5.0-13",
+		"@carnesen/cli": "0.5.0-14",
+		"@carnesen/cli-examples": "0.5.0-14",
 		"@carnesen/tsconfig": "0.3.1",
 		"@types/jest": "25.2.3",
 		"@types/node": "14.0.12",
@@ -28,7 +26,9 @@
 		"eslint": "7.2.0",
 		"eslint-config-carnesen": "4.0.0",
 		"html-webpack-plugin": "4.3.0",
+		"jest": "26.0.1",
 		"style-loader": "1.2.1",
+		"ts-jest": "26.1.0",
 		"ts-loader": "7.0.5",
 		"typescript": "3.9.5",
 		"webpack": "4.43.0",
@@ -39,12 +39,10 @@
 	},
 	"files": [
 		"src",
-		"lib",
 		"dist"
 	],
 	"publishConfig": {
-		"access": "public",
-		"tag": "next"
+		"access": "public"
 	},
 	"keywords": [
 		"typescript",

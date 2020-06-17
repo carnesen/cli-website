@@ -30,7 +30,7 @@ module.exports = {
 <html>
   <head>
     <meta charset="utf-8"/>
-    <title>@carnesen/cli examples</title>
+		<title>@carnesen/cli examples</title>
   </head>
 	<body>
 			<div id="terminal-container"></div>
@@ -43,4 +43,5 @@ module.exports = {
 		path: path.resolve(__dirname, 'examples'),
 		publicPath: '/examples',
 	},
+	resolve: { extensions: ['.ts', '.tsx', '.js', '.json'] },
 };
