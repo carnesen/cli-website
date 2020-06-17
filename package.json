@@ -14,6 +14,7 @@
 		"lint": "eslint src/",
 		"fix": "npm run lint -- --fix",
 		"test": "npm run lint && npm run build",
+		"unit-test": "jest src",
 		"prepublishOnly": "npm test"
 	},
 	"dependencies": {},
@@ -28,7 +29,9 @@
 		"eslint": "7.2.0",
 		"eslint-config-carnesen": "4.0.0",
 		"html-webpack-plugin": "4.3.0",
+		"jest": "26.0.1",
 		"style-loader": "1.2.1",
+		"ts-jest": "26.1.0",
 		"ts-loader": "7.0.5",
 		"typescript": "3.9.5",
 		"webpack": "4.43.0",
