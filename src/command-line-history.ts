@@ -13,7 +13,9 @@ export class CommandLineHistory {
 
 		if (this.index > 0 && line.length > 0) {
 			if (this.lines[0].length > 0) {
-				this.lines.unshift(line);
+				if (this.lines[0] !== line) {
+					this.lines.unshift(line);
+				}
 			} else {
 				this.lines[0] = line;
 			}
