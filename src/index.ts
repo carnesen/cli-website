@@ -21,8 +21,6 @@ import { CliExamplesRepl } from './cli-examples-repl';
 	fitAddon.fit();
 	const repl = new CliExamplesRepl({
 		terminal,
-		motd:
-			'Welcome to the @carnesen/cli live examples! Hit "Enter" to get started.',
 	});
 
 	repl.start();

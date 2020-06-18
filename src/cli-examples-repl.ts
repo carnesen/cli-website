@@ -5,7 +5,6 @@ import { CommandLineHistory } from './command-line-history';
 
 interface IPseudoShellOptions {
 	terminal: Terminal;
-	motd?: string;
 }
 
 function yellow(message: string) {
@@ -19,8 +18,6 @@ const PS1 = '$ ';
 export class CliExamplesRepl {
 	private readonly terminal: Terminal;
 
-	private readonly motd: string;
-
 	private runningCommand = false;
 
 	private settingCurrentLine = false;
@@ -29,9 +26,10 @@ export class CliExamplesRepl {
 
 	private line = '';
 
-	public constructor({ terminal, motd }: IPseudoShellOptions) {
+	private index = 0;
+
+	public constructor({ terminal }: IPseudoShellOptions) {
 		this.terminal = terminal;
-		this.motd = motd || '';
 	}
 
 	public start(): void {
@@ -40,10 +38,9 @@ export class CliExamplesRepl {
 		});
 
 		this.terminal.focus();
-		if (this.motd) {
-			this.terminal.writeln(this.motd);
-			this.terminal.writeln('');
-		}
+		this.terminal.writeln('Welcome to the @carnesen/cli live examples!');
+		this.terminal.writeln('');
+		this.terminal.writeln('Hit "Enter" to get started.');
 		this.prompt();
 	}
 
@@ -66,22 +63,25 @@ export class CliExamplesRepl {
 		switch (domEvent.keyCode) {
 			case 8: {
 				// delete
-				// Do not delete the prompt
-				if ((this.terminal as any)._core.buffer.x > PS1.length) {
-					this.terminal.write('\b \b');
+				if (this.index === 0) {
+					break;
 				}
-				this.line = this.line.slice(0, -1);
+				const line =
+					this.line.substring(0, this.index - 1) +
+					this.line.substring(this.index, this.line.length);
+				this.setLine(line, this.index - 1);
 				break;
 			}
 
 			case 9: {
 				// tab
-				if (this.line) {
+				const lineBeforeCursor = this.line.substring(0, this.index);
+				if (lineBeforeCursor) {
 					const child = examples.children.find((c) =>
-						c.name.startsWith(this.line),
+						c.name.startsWith(lineBeforeCursor),
 					);
 					if (child) {
-						this.setLine(`${child.name} `);
+						this.addToLine(`${child.name.substring(lineBeforeCursor.length)} `);
 					}
 				}
 				break;
@@ -95,6 +95,11 @@ export class CliExamplesRepl {
 
 			case 37: {
 				// left arrow
+				if (this.index === 0) {
+					break;
+				}
+				this.terminal.write(key);
+				this.index -= 1;
 				break;
 			}
 
@@ -106,18 +111,23 @@ export class CliExamplesRepl {
 
 			case 39: {
 				// right arrow
+				if (this.index === this.line.length) {
+					break;
+				}
+				this.terminal.write(key);
+				this.index += 1;
 				break;
 			}
 
 			case 40: {
-				// up arrow
+				// down arrow
 				this.setLine(this.commandLineHistory.next(this.line));
 				break;
 			}
 
 			default: {
 				if (printable) {
-					this.appendChar(key);
+					this.addToLine(key);
 				}
 			}
 		}
@@ -130,6 +140,11 @@ export class CliExamplesRepl {
 			}
 		} else if (typeof arg === 'number') {
 			this.terminal.writeln(yellow(String(arg)));
+		} else if (typeof arg === 'object' && typeof arg.stack === 'string') {
+			// Error object
+			for (const line of arg.stack.split('\n')) {
+				this.terminal.writeln(line);
+			}
 		} else {
 			this.terminal.writeln(String(arg));
 		}
@@ -155,11 +170,9 @@ export class CliExamplesRepl {
 		this.terminal.write('\r\n');
 		examples.name = '';
 		examples.description = `
-		This is a special web terminal built on Xterm.js that runs the 
-		@carnesen/cli examples 
-		right there in your browser. Hit the Tab key for auto-complete. 
-		The up and down arrows navigate command history. Right and left arrow
-		aren't implemented yet.
+		This is a special terminal that runs 
+		@carnesen/cli examples in your browser. Up and 
+		down arrows navigate command history. Tab auto-completes.
 		`;
 		runCliAndExit(Cli(examples), options)
 			.catch((err) => {
@@ -167,27 +180,32 @@ export class CliExamplesRepl {
 			})
 			.then(() => {
 				this.line = '';
+				this.index = 0;
 				this.runningCommand = false;
 				this.prompt();
 			});
 	}
 
-	private setLine(line: string) {
+	private setLine(line: string, index?: number) {
 		if (line === this.line) {
 			return;
 		}
 		this.settingCurrentLine = true;
 		const changeInLength = line.length - this.line.length;
 		let sequence = '';
-		if (changeInLength < 0) {
-			sequence += '\b'.repeat(-1 * changeInLength);
-			sequence += ' '.repeat(-1 * changeInLength);
-		}
 		sequence += '\r';
 		sequence += PS1;
 		sequence += line;
+		if (changeInLength < 0) {
+			sequence += ' '.repeat(-1 * changeInLength);
+			sequence += '\b'.repeat(-1 * changeInLength);
+		}
+		if (typeof index === 'number') {
+			sequence += '\b'.repeat(line.length - index);
+		}
 		this.terminal.write(sequence, () => {
 			this.line = line;
+			this.index = typeof index === 'number' ? index : line.length;
 			this.settingCurrentLine = false;
 		});
 	}
@@ -197,8 +215,11 @@ export class CliExamplesRepl {
 		this.runCurrentLine();
 	}
 
-	private appendChar(s: string) {
-		this.terminal.write(s);
-		this.line += s;
+	private addToLine(str: string) {
+		const line =
+			this.line.substring(0, this.index) +
+			str +
+			this.line.substring(this.index);
+		this.setLine(line, this.index + str.length);
 	}
 }
