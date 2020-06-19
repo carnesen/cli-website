@@ -1,7 +1,7 @@
 {
 	"name": "@carnesen/cli-website",
 	"description": "Source for https://cli.carnesen.com/examples/index.html",
-	"version": "2020.6.0",
+	"version": "2020.6.1",
 	"engines": {
 		"node": ">=10.0.0"
 	},
@@ -16,13 +16,13 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"@carnesen/cli": "0.5.0-14",
-		"@carnesen/cli-examples": "0.5.0-14",
+		"@carnesen/cli": "0.5.0-16",
+		"@carnesen/cli-examples": "0.5.0-16",
 		"@carnesen/tsconfig": "0.3.1",
-		"@types/jest": "25.2.3",
-		"@types/node": "14.0.12",
+		"@types/jest": "26.0.0",
+		"@types/node": "14.0.13",
 		"clean-webpack-plugin": "3.0.0",
-		"css-loader": "3.5.3",
+		"css-loader": "3.6.0",
 		"eslint": "7.2.0",
 		"eslint-config-carnesen": "4.0.0",
 		"html-webpack-plugin": "4.3.0",
@@ -32,10 +32,11 @@
 		"ts-loader": "7.0.5",
 		"typescript": "3.9.5",
 		"webpack": "4.43.0",
-		"webpack-cli": "3.3.11",
+		"webpack-cli": "3.3.12",
 		"webpack-dev-server": "3.11.0",
-		"xterm": "4.6.0",
-		"xterm-addon-fit": "0.4.0"
+		"xterm": "4.7.0",
+		"xterm-addon-fit": "0.4.0",
+		"xterm-addon-web-links": "0.4.0"
 	},
 	"files": [
 		"src",

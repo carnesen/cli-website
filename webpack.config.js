@@ -31,8 +31,14 @@ module.exports = {
   <head>
     <meta charset="utf-8"/>
 		<title>@carnesen/cli examples</title>
+		<link rel="stylesheet" href="/assets/css/fonts.css">
+		<style>
+			html { font-family: 'MonoLisa', sans-serif; }
+			a { color: inherit; text-decoration: inherit; }
+		</style>
   </head>
 	<body>
+			<h2><a href="https://cli.carnesen.com">@carnesen/cli</a> examples</h2>
 			<div id="terminal-container"></div>
   </body>
 </html>`,
