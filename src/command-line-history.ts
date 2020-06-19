@@ -1,47 +1,71 @@
-export class CommandLineHistory {
-	private readonly lines: string[] = [
-		'',
-		'echo foo bar baz',
-		'multiply 2 3 4',
-		'throw-special-error --message Foo',
-	];
+const DEFAULT_LINES = [''];
 
-	private index = 0;
+export class CommandLineHistory {
+	private readonly lines: string[];
+
+	private index: number;
+
+	public constructor(lines = DEFAULT_LINES) {
+		this.lines = lines;
+		this.index = this.maxIndex();
+	}
+
+	private maxIndex(): number {
+		return this.lines.length - 1;
+	}
+
+	private lastLine(line?: string): string {
+		if (typeof line === 'string') {
+			this.lines[this.maxIndex()] = line;
+		}
+		return this.lines[this.maxIndex()];
+	}
+
+	private currentLine(line?: string): string {
+		if (typeof line === 'string') {
+			this.lines[this.index] = line;
+		}
+		return this.lines[this.index];
+	}
 
 	public submit(line: string): void {
 		this.lines[this.index] = line;
 
-		if (this.index > 0 && line.length > 0) {
-			if (this.lines[0].length > 0) {
-				if (this.lines[0] !== line) {
-					this.lines.unshift(line);
+		if (this.index < this.maxIndex() && line.length > 0) {
+			if (this.lastLine().length > 0) {
+				if (line !== this.lastLine() && line !== 'history') {
+					this.lines.push(line);
 				}
-			} else {
-				this.lines[0] = line;
+			} else if (line !== 'history') {
+				this.lastLine(line);
 			}
 		}
 
-		this.index = 0;
-
-		// If there's not already a '' as the first line
-		if (this.lines[0].length > 0) {
-			this.lines.unshift('');
+		// If there's not already a '' as the last line
+		if (this.lastLine().length > 0) {
+			this.lines.push('');
 		}
+
+		this.index = this.maxIndex();
 	}
 
 	public previous(line: string): string {
-		this.lines[this.index] = line;
-		if (this.index < this.lines.length - 1) {
-			this.index += 1;
-		}
-		return this.lines[this.index];
-	}
-
-	public next(line: string): string {
-		this.lines[this.index] = line;
+		this.currentLine(line);
 		if (this.index > 0) {
 			this.index -= 1;
 		}
-		return this.lines[this.index];
+		return this.currentLine();
+	}
+
+	public next(line: string): string {
+		this.currentLine(line);
+		if (this.index < this.maxIndex()) {
+			this.index += 1;
+		}
+		return this.currentLine();
+	}
+
+	public list(): string[] {
+		return [...this.lines];
 	}
 }

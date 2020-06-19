@@ -1,7 +1,12 @@
 import { Terminal } from 'xterm';
-import { runCliAndExit, IRunCliAndExitOptions, Cli } from '@carnesen/cli';
-import { examples } from '@carnesen/cli-examples';
+import {
+	runCliAndExit,
+	IRunCliAndExitOptions,
+	Cli,
+	ICliBranch,
+} from '@carnesen/cli';
 import { CommandLineHistory } from './command-line-history';
+import { Root } from './root';
 
 interface IPseudoShellOptions {
 	terminal: Terminal;
@@ -11,9 +16,13 @@ function yellow(message: string) {
 	return `\u001b[33m${message}\u001b[39m`;
 }
 
+function green(message: string) {
+	return `\u001b[32m${message}\u001b[39m`;
+}
+
 type KeyEvent = { key: string; domEvent: KeyboardEvent };
 
-const PS1 = '$ ';
+const PS1 = `${green('$')} `;
 
 export class CliExamplesRepl {
 	private readonly terminal: Terminal;
@@ -22,14 +31,24 @@ export class CliExamplesRepl {
 
 	private settingCurrentLine = false;
 
-	private readonly commandLineHistory = new CommandLineHistory();
+	private readonly commandLineHistory: CommandLineHistory;
 
 	private line = '';
 
 	private index = 0;
 
+	private readonly root: ICliBranch;
+
 	public constructor({ terminal }: IPseudoShellOptions) {
 		this.terminal = terminal;
+		this.commandLineHistory = new CommandLineHistory([
+			'throw-special-error --message Foo',
+			'multiply 2 3 4',
+			'echo foo bar baz',
+			'history',
+			'',
+		]);
+		this.root = Root(this.commandLineHistory);
 	}
 
 	public start(): void {
@@ -38,8 +57,6 @@ export class CliExamplesRepl {
 		});
 
 		this.terminal.focus();
-		this.terminal.writeln('Welcome to the @carnesen/cli live examples!');
-		this.terminal.writeln('');
 		this.terminal.writeln('Hit "Enter" to get started.');
 		this.prompt();
 	}
@@ -77,7 +94,7 @@ export class CliExamplesRepl {
 				// tab
 				const lineBeforeCursor = this.line.substring(0, this.index);
 				if (lineBeforeCursor) {
-					const child = examples.children.find((c) =>
+					const child = this.root.children.find((c) =>
 						c.name.startsWith(lineBeforeCursor),
 					);
 					if (child) {
@@ -168,13 +185,7 @@ export class CliExamplesRepl {
 		};
 		this.runningCommand = true;
 		this.terminal.write('\r\n');
-		examples.name = '';
-		examples.description = `
-		This is a special terminal that runs 
-		@carnesen/cli examples in your browser. Up and 
-		down arrows navigate command history. Tab auto-completes.
-		`;
-		runCliAndExit(Cli(examples), options)
+		runCliAndExit(Cli(this.root), options)
 			.catch((err) => {
 				console.log(err); // eslint-disable-line no-console
 			})
