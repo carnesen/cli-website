@@ -1,7 +1,7 @@
 import { CliCommand, ICliCommand } from '@carnesen/cli';
 import { CommandLineHistory } from './command-line-history';
 
-export function History(
+export function HistoryCommand(
 	commandLineHistory: CommandLineHistory,
 ): ICliCommand<any, any, any> {
 	const history = CliCommand({
