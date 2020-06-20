@@ -1,7 +1,7 @@
 {
 	"name": "@carnesen/cli-website",
 	"description": "Source for https://cli.carnesen.com/examples/index.html",
-	"version": "2020.6.1",
+	"version": "2020.6.2",
 	"engines": {
 		"node": ">=10.0.0"
 	},
