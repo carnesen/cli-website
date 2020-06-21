@@ -3,37 +3,35 @@ import {
 	runCliAndExit,
 	IRunCliAndExitOptions,
 	Cli,
-	ICliBranch,
 	findCliNode,
 	CLI_COMMAND,
+	ICliBranch,
+	ICliCommand,
+	CliBranch,
 } from '@carnesen/cli';
 
 import { CommandLineHistory } from './command-line-history';
-import { RootBranch } from './root-branch';
 import { LongestLeadingSubstring } from './longest-leading-substring';
+import { green, yellow, splitWords } from './util';
+import { HistoryCommand } from './history-command';
 
 const INDENTATION = '    ';
-interface IPseudoShellOptions {
+
+export interface ICliPseudoShellOptions {
+	/** A short description of this branch for command-line usage */
+	description?: string;
+
+	/** [[`ICliBranch`]] and/or [[`ICliCommand`]]s underneath this branch */
+	subcommands: (ICliBranch | ICliCommand<any, any, any>)[];
 	terminal: Terminal;
-}
-
-function yellow(message: string) {
-	return `\u001b[33m${message}\u001b[39m`;
-}
-
-function green(message: string) {
-	return `\u001b[32m${message}\u001b[39m`;
-}
-
-function splitWords(line: string): string[] {
-	return line.split(' ').filter((word) => word.length > 0);
+	history?: string[];
 }
 
 type KeyEvent = { key: string; domEvent: KeyboardEvent };
 
 const PS1 = `${green('$')} `;
 
-export class CliExamplesRepl {
+export class CliPseudoShell {
 	private readonly terminal: Terminal;
 
 	private runningCommand = false;
@@ -48,18 +46,21 @@ export class CliExamplesRepl {
 
 	private readonly root: ICliBranch;
 
-	public constructor({ terminal }: IPseudoShellOptions) {
+	public constructor({
+		description,
+		subcommands,
+		terminal,
+		history,
+	}: ICliPseudoShellOptions) {
 		this.terminal = terminal;
-		this.commandLineHistory = new CommandLineHistory([
-			'advanced',
-			'show show',
-			'throw-error --message Foo',
-			'multiply 2 3 4',
-			'echo foo bar baz',
-			'history',
-			'',
-		]);
-		this.root = RootBranch(this.commandLineHistory);
+		this.commandLineHistory = new CommandLineHistory(history);
+		this.line = this.commandLineHistory.current();
+		const builtInCommands = [HistoryCommand(this.commandLineHistory)];
+		this.root = CliBranch({
+			description,
+			name: '',
+			subcommands: [...subcommands, ...builtInCommands],
+		});
 	}
 
 	public start(): void {
@@ -246,20 +247,20 @@ export class CliExamplesRepl {
 			return;
 		}
 		const searchTerm = node.args[0] || '';
-		const matchingChildren = node.current.children.filter((c) =>
+		const matchingSubcommands = node.current.subcommands.filter((c) =>
 			c.name.startsWith(searchTerm),
 		);
 
-		if (matchingChildren.length === 1) {
+		if (matchingSubcommands.length === 1) {
 			// There is a single child matching the search term. Auto-complete the
 			// whole command name and put a space too to start the next arg.
 			this.addToLine(
-				`${matchingChildren[0].name.substring(searchTerm.length)} `,
+				`${matchingSubcommands[0].name.substring(searchTerm.length)} `,
 			);
-		} else if (matchingChildren.length > 1) {
+		} else if (matchingSubcommands.length > 1) {
 			// First try autocomplete the longest leading substring
 			const longestLeadingSubstring = LongestLeadingSubstring(
-				matchingChildren.map(({ name }) => name),
+				matchingSubcommands.map(({ name }) => name),
 				searchTerm,
 			);
 			if (longestLeadingSubstring.length > searchTerm.length) {
@@ -268,7 +269,7 @@ export class CliExamplesRepl {
 			} else {
 				// Write out the possibilities and make them refine
 				this.consoleLog('');
-				for (const { name } of matchingChildren) {
+				for (const { name } of matchingSubcommands) {
 					this.consoleLog(`${INDENTATION}${name}`);
 				}
 				const countAfterCursor = this.line.length - this.index;

@@ -1,11 +1,13 @@
 import { Terminal, ITerminalOptions } from 'xterm';
 import { FitAddon } from 'xterm-addon-fit';
 import { WebLinksAddon } from 'xterm-addon-web-links';
-import { CliExamplesRepl } from './cli-examples-repl';
+import { root as examples } from '@carnesen/cli-examples';
+import { CliPseudoShell } from './cli-pseudo-shell';
 
 import 'xterm/css/xterm.css';
+import { showCommand } from './show-command';
 
-(async function loadTerminalApplication() {
+async function loadTerminalApplication() {
 	await (document as any).fonts.load('12px MonoLisa');
 
 	const terminalOptions: ITerminalOptions = {
@@ -29,9 +31,29 @@ import 'xterm/css/xterm.css';
 	// element.style.height = '450px';
 	terminal.open(element);
 	fitAddon.fit();
-	const repl = new CliExamplesRepl({
+	const pseudoShell = new CliPseudoShell({
+		history: [
+			'advanced',
+			'show show',
+			'throw-error --message Foo',
+			'multiply 2 3 4',
+			'echo foo bar baz',
+			'history',
+			'',
+		],
+		description: `
+				This is a special terminal that runs 
+				@carnesen/cli examples in your browser. Up and 
+				down arrows navigate command history. Tab auto-completes.`,
+		subcommands: [...examples.subcommands, showCommand],
 		terminal,
 	});
 
-	repl.start();
-})();
+	pseudoShell.start();
+}
+
+loadTerminalApplication().catch((exception) => {
+	if (process.env.NODE_ENV !== 'test') {
+		console.error(exception); // eslint-disable-line no-console
+	}
+});
